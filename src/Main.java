@@ -5,6 +5,8 @@ public class Main {
 
         Application app = new Application();
         app.menu();
+        Complex complex = new Complex(13,78);
+        System.out.println(complex);
     }
 
 }
