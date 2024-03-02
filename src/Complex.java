@@ -1,5 +1,5 @@
 public class Complex {
-    private double real ;
+    private double real;
     private double imaginary;
 
     public Complex(double real, double imaginary) {
