@@ -8,7 +8,7 @@ public class Complex {
     }
 
     public double getReal() {
-        return real;
+        return real ;
     }
 
     public double getImaginary() {
