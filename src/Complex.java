@@ -12,7 +12,7 @@ public class Complex {
     }
 
     public double getImaginary() {
-        return imaginary;
+        return imaginary ;
     }
 
     public Complex add(Complex other) {
