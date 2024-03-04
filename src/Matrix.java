@@ -1,165 +1,162 @@
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
-public class Matrix {
-    double[][] matrix;
+public class Matrix<T> {
+    private ArrayList<ArrayList<T>> matrix;
+    private int type = 1;
+    public Matrix(int dimension) {
+        matrix = new ArrayList<>();
 
-    public Matrix(int dimensionX, int dimensionY){
-        Random rn = new Random();
-        int n = 10 - 1 + 1;
-        matrix = new double[dimensionX][dimensionY];
-        for (int i = 0; i<dimensionX; i++){
-            for (int j = 0; j<dimensionY; j++){
-                matrix[i][j] = rn.nextInt() % n +1;
+        for (int i = 0; i < dimension; i++) {
+            ArrayList<T> row = new ArrayList<>();
+            for (int j = 0; j < dimension; j++) {
+                row.add((T) Integer.valueOf(0));
             }
+            matrix.add(row);
         }
     }
-    private int getMaxElementLength() {
-        int maxLength = 0;
-        int rows = matrix.length;
-        int cols = matrix[0].length;
-        for (int i = 0; i < rows; i++){
-            for (int j = 0; j < cols; j++){
-                int length = String.valueOf(matrix[i][j]).length();
-                if (length > maxLength) {
-                    maxLength = length;
-                }
-            }
-        }
-        return maxLength;
-    }
 
-    public void setNewMatrix(int dimensionX, int dimensionY){
-        matrix = new double[dimensionX][dimensionY];
+    public void setNewMatrix(int dimension, int type) {
+        this.type = type;
+        matrix = new ArrayList<>();
         Scanner scanner = new Scanner(System.in);
-        for (int i = 0; i<dimensionX; i++){
-            for (int j = 0; j<dimensionY; j++){
-                matrix[i][j] = scanner.nextDouble();
+        for (int i = 0; i < dimension; i++) {
+            ArrayList<T> row = new ArrayList<>();
+            for (int j = 0; j < dimension; j++) {
+                T element = switch (type) {
+                    case 1 -> (T) Integer.valueOf(scanner.nextInt());
+                    case 2 -> (T) Double.valueOf(scanner.nextDouble());
+                    default ->(T) scanner.next("([-+]?\\d*\\.?\\d+)([-+])(\\d*\\.?\\d+)i");
+                };
+                row.add(element);
             }
+            matrix.add(row);
         }
     }
-    public void printMatrix(){
+
+    public void printMatrix() {
         int maxLength = getMaxElementLength();
-        int rows = matrix.length;
-        int cols = matrix[0].length;
-        for (int i = 0; i<rows; i++){
-            for (int j = 0; j<cols; j++){
-                System.out.printf("%" + (maxLength + 3) + ".1f", matrix[i][j]);
+        int dimension = matrix.size();
+        for (ArrayList<T> row : matrix) {
+            for (T element : row) {
+                System.out.printf("%-" + (maxLength + 2) + "s", element);
             }
             System.out.println();
         }
     }
 
     public void transpose() {
-        int rows = matrix.length;
-        int cols = matrix[0].length;
+        int rows = matrix.size();
+        int cols = matrix.get(0).size();
 
-        double[][] transposed = new double[cols][rows];
-
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                transposed[j][i] = matrix[i][j];
+        ArrayList<ArrayList<T>> transposed = new ArrayList<>();
+        for (int i = 0; i < cols; i++) {
+            ArrayList<T> newRow = new ArrayList<>();
+            for (int j = 0; j < rows; j++) {
+                newRow.add(matrix.get(j).get(i));
             }
+            transposed.add(newRow);
         }
         matrix = transposed;
-
     }
-    public double getDeterminant(){
-        if (matrix.length != matrix[0].length) return -1242335.23123;
-        return determinant(matrix);
-    }
-    private double determinant(double[][] matrix) {
-        int rows = matrix.length;
-        int cols = matrix[0].length;
 
-        if (rows != cols) {
-            throw new IllegalArgumentException("Matrix must be square");
+    public int getRank(){
+        return switch (type) {
+            case 1, 2 -> getIntRank();
+            default -> getComplexRank();
+        };
+    }
+    private int getComplexRank(){
+        ArrayList<ArrayList<T>> matrixCopy = new ArrayList<>();
+
+        for (ArrayList<T> row : matrix) {
+            ArrayList<T> newRow = new ArrayList<>(row);
+            matrixCopy.add(newRow);
         }
 
-        if (rows == 1 && cols == 1) {
-            return matrix[0][0];
-        }
-
-        int det = 0;
-        for (int i = 0; i < cols; i++) {
-            det += matrix[0][i] * cofactor(matrix, 0, i);
-        }
-
-        return det;
-    }
-
-    private  double cofactor(double[][] matrix, int row, int col) {
-        return (int) Math.pow(-1, row + col) * minor(matrix, row, col);
-    }
-
-    private  double minor(double[][] matrix, int row, int col) {
-        return determinant(getSubMatrix(matrix, row, col));
-    }
-
-    private  double[][] getSubMatrix(double[][] matrix, int rowToRemove, int colToRemove) {
-        int rows = matrix.length;
-        int cols = matrix[0].length;
-        double[][] subMatrix = new double[rows - 1][cols - 1];
-        int r = 0, c = 0;
-        for (int i = 0; i < rows; i++) {
-            if (i == rowToRemove) {
-                continue;
+        int rowCount = matrixCopy.size();
+        int colCount = matrixCopy.get(0).size();
+        int rank = 0;
+        for (int row = 0; row < rowCount; row++) {
+            boolean rowContainsNonZero = false;
+            for (int col = 0; col < colCount; col++) {
+                if (!matrixCopy.get(row).get(col).equals(new Complex(0, 0))) { // Сравнение с нулем
+                    rowContainsNonZero = true;
+                    break;
+                }
             }
-            c = 0;
-            for (int j = 0; j < cols; j++) {
-                if (j == colToRemove) {
-                    continue;
+            if (rowContainsNonZero) {
+                rank++;
+                for (int i = row + 1; i < rowCount; i++) {
+                    double ratio = matrixCopy.get(i).get(row).divide(matrixCopy.get(row).get(row)).abs(); // Вычисление абсолютного значения
+                    for (int j = row; j < colCount; j++) {
+                        Complex.multiply((Complex) matrixCopy.get(i).get(j));
+                        Complex newValue = matrixCopy.get(i).get(j).subtract(matrixCopy.get(row).get(j).);
+                        matrixCopy.get(i).set(j, (T) newValue);
+                    }
                 }
-                subMatrix[r][c] = matrix[i][j];
-                c++;
             }
-            r++;
         }
-        return subMatrix;
     }
-    public int getRank() {
-        int rows = matrix.length;
-        int cols = matrix[0].length;
-        int rank = Math.min(rows, cols);
+    private int getIntRank() {
 
-        for (int row = 0; row < rank; row++) {
-            if (matrix[row][row] != 0) {
-                for (int col = 0; col < rows; col++) {
-                    if (col != row) {
-                        double ratio = matrix[col][row] / matrix[row][row];
-                        for (int i = 0; i < rank; i++) {
-                            matrix[col][i] -= ratio * matrix[row][i];
-                        }
-                    }
+        ArrayList<ArrayList<T>> matrixCopy = matrix.stream()
+                .map(ArrayList::new)
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        int rowCount = matrixCopy.size();
+        int colCount = matrixCopy.get(0).size();
+        int rank = 0;
+
+        for (int row = 0; row < rowCount; row++) {
+            boolean rowContainsNonZero = false;
+            for (int col = 0; col < colCount; col++) {
+                System.out.println(matrixCopy.get(row).get(col));
+                if (!Objects.equals(matrixCopy.get(row).get(col).toString(), "0.0")) {
+                    rowContainsNonZero = true;
+                    break;
                 }
-            } else {
-                boolean reduce = true;
-                for (int i = row + 1; i < rows; i++) {
-                    if (matrix[i][row] != 0) {
-                        swapRows(matrix, row, i);
-                        reduce = false;
-                        break;
-                    }
-                }
-
-                if (reduce) {
-                    rank--;
-
-                    for (int i = 0; i < rows; i++) {
-                        matrix[i][row] = matrix[i][rank];
+            }
+            if (rowContainsNonZero) {
+                rank++;
+                for (int i = row + 1; i < rowCount; i++) {
+                    T ratio = ((Number) matrixCopy.get(i).get(row)) / ((Number) matrixCopy.get(row).get(row));
+                    for (int j = row; j < colCount; j++) {
+                        T newValue = ((Number) matrixCopy.get(i).get(j)).doubleValue() -
+                                ratio * ((Number) matrixCopy.get(row).get(j)).doubleValue();
+                        matrixCopy.get(i).set(j, (T) Double.valueOf(newValue));
                     }
                 }
 
-                row--;
             }
         }
 
         return rank;
     }
 
-    private static void swapRows(double[][] matrix, int row1, int row2) {
-        double[] temp = matrix[row1];
-        matrix[row1] = matrix[row2];
-        matrix[row2] = temp;
+
+    private void swapRows(ArrayList<ArrayList<T>> matrix, int row1, int row2) {
+        ArrayList<T> temp = new ArrayList<>(matrix.get(row1));
+        matrix.set(row1, new ArrayList<>(matrix.get(row2)));
+        matrix.set(row2, temp);
     }
+
+    private int getMaxElementLength() {
+        int maxLength = 0;
+        for (ArrayList<T> row : matrix) {
+            for (T element : row) {
+                if (element != null) {
+                    int length = String.valueOf(element).length();
+                    if (length > maxLength) {
+                        maxLength = length;
+                    }
+                }
+            }
+        }
+        return maxLength;
+    }
+
+    private
 }

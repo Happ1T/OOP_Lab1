@@ -23,9 +23,9 @@ public class Complex {
         return new Complex(this.real - other.real, this.imaginary - other.imaginary);
     }
 
-    public Complex multiply(Complex other) {
-        double newReal = this.real * other.real - this.imaginary * other.imaginary;
-        double newImaginary = this.real * other.imaginary + this.imaginary * other.real;
+   static public Complex multiply(Complex other) {
+        double newReal = other.real * other.real - other.imaginary * other.imaginary;
+        double newImaginary = other.real * other.imaginary + other.imaginary * other.real;
         return new Complex(newReal, newImaginary);
     }
 
