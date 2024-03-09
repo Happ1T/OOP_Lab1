@@ -62,86 +62,11 @@ public class Matrix<T> {
         matrix = transposed;
     }
 
-    public int getRank(){
-        return switch (type) {
-            case 1, 2 -> getIntRank();
-            default -> getComplexRank();
-        };
-    }
-    private int getComplexRank(){
-        ArrayList<ArrayList<T>> matrixCopy = new ArrayList<>();
-
-        for (ArrayList<T> row : matrix) {
-            ArrayList<T> newRow = new ArrayList<>(row);
-            matrixCopy.add(newRow);
-        }
-
-        int rowCount = matrixCopy.size();
-        int colCount = matrixCopy.get(0).size();
-        int rank = 0;
-        for (int row = 0; row < rowCount; row++) {
-            boolean rowContainsNonZero = false;
-            for (int col = 0; col < colCount; col++) {
-                if (!matrixCopy.get(row).get(col).equals(new Complex(0, 0))) { // Сравнение с нулем
-                    rowContainsNonZero = true;
-                    break;
-                }
-            }
-            if (rowContainsNonZero) {
-                rank++;
-                for (int i = row + 1; i < rowCount; i++) {
-                    double ratio = matrixCopy.get(i).get(row).divide(matrixCopy.get(row).get(row)).abs(); // Вычисление абсолютного значения
-                    for (int j = row; j < colCount; j++) {
-                        Complex.multiply((Complex) matrixCopy.get(i).get(j));
-                        Complex newValue = matrixCopy.get(i).get(j).subtract(matrixCopy.get(row).get(j).);
-                        matrixCopy.get(i).set(j, (T) newValue);
-                    }
-                }
-            }
-        }
-    }
-    private int getIntRank() {
-
-        ArrayList<ArrayList<T>> matrixCopy = matrix.stream()
-                .map(ArrayList::new)
-                .collect(Collectors.toCollection(ArrayList::new));
-
-        int rowCount = matrixCopy.size();
-        int colCount = matrixCopy.get(0).size();
-        int rank = 0;
-
-        for (int row = 0; row < rowCount; row++) {
-            boolean rowContainsNonZero = false;
-            for (int col = 0; col < colCount; col++) {
-                System.out.println(matrixCopy.get(row).get(col));
-                if (!Objects.equals(matrixCopy.get(row).get(col).toString(), "0.0")) {
-                    rowContainsNonZero = true;
-                    break;
-                }
-            }
-            if (rowContainsNonZero) {
-                rank++;
-                for (int i = row + 1; i < rowCount; i++) {
-                    T ratio = ((Number) matrixCopy.get(i).get(row)) / ((Number) matrixCopy.get(row).get(row));
-                    for (int j = row; j < colCount; j++) {
-                        T newValue = ((Number) matrixCopy.get(i).get(j)).doubleValue() -
-                                ratio * ((Number) matrixCopy.get(row).get(j)).doubleValue();
-                        matrixCopy.get(i).set(j, (T) Double.valueOf(newValue));
-                    }
-                }
-
-            }
-        }
-
-        return rank;
-    }
 
 
-    private void swapRows(ArrayList<ArrayList<T>> matrix, int row1, int row2) {
-        ArrayList<T> temp = new ArrayList<>(matrix.get(row1));
-        matrix.set(row1, new ArrayList<>(matrix.get(row2)));
-        matrix.set(row2, temp);
-    }
+
+
+
 
     private int getMaxElementLength() {
         int maxLength = 0;
@@ -158,5 +83,5 @@ public class Matrix<T> {
         return maxLength;
     }
 
-    private
+
 }

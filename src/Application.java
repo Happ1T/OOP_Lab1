@@ -32,10 +32,10 @@ public class Application {
 //                        System.out.print("Определитель матрицы равен: " + det);
 //
 //                }break;
-                case 3: {
-                    System.out.println("Ранг матрицы равен: " + matrix.getRank());
-
-                }break;
+//                case 3: {
+//                    System.out.println("Ранг матрицы равен: " + matrix.getRank());
+//
+//                }break;
                 case 4:{
                     System.out.println("Матрица была транспонирована");
                     matrix.transpose();
