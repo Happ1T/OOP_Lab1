@@ -6,12 +6,31 @@ public class Complex implements NumberOperations<Complex>{
         this.realPart = realPart;
         this.imaginaryPart = imaginaryPart;
     }
+    public static Complex parseComplex(String input) {
+        // Разделение строки на действительную и мнимую части
+        String[] parts = input.split("(?=[+-])");
 
+        // Проверка на наличие мнимой части
+        if (parts.length == 1) {
+            // Если нет мнимой части, предполагаем, что мнимая часть равна 0
+            double realPart = Double.parseDouble(parts[0]);
+            return new Complex(realPart, 0);
+        } else {
+            // Если есть и действительная, и мнимая части
+            double realPart = Double.parseDouble(parts[0]);
+            // Удаление "i" из строки мнимой части и парсинг в double
+            double imaginaryPart = Double.parseDouble(parts[1].replace("i", ""));
+            return new Complex(realPart, imaginaryPart);
+        }
+    }
     @Override
     public Complex summ(Complex other) {
         return new Complex(this.realPart + other.realPart, this.imaginaryPart + other.imaginaryPart);
     }
-
+    @Override
+    public boolean isZero(){
+        return realPart == 0 && imaginaryPart == 0;
+    }
 
     @Override
     public Complex subtract(Complex other) {
@@ -39,9 +58,9 @@ public class Complex implements NumberOperations<Complex>{
     @Override
     public void printNumber() {
         if (imaginaryPart < 0) {
-            System.out.println("(" + realPart + imaginaryPart + "i)");
+            System.out.print("(" + realPart + imaginaryPart + "i) ");
         } else {
-            System.out.println("(" + realPart + "+" + imaginaryPart + "i)");
+            System.out.print("(" + realPart + "+" + imaginaryPart + "i) ");
         }
     }
 }

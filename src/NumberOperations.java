@@ -10,6 +10,6 @@ public interface NumberOperations<T> {
 
     T divide(T other);
 
-
+    boolean isZero();
     void printNumber();
 }

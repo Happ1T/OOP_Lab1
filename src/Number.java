@@ -1,9 +1,9 @@
 public class Number implements NumberOperations<Number>{
     private double value;
+
     public Number(double value) {
         this.value = value;
     }
-
     @Override
     public Number summ(Number other) {
         return new Number(this.value + other.value);
@@ -27,10 +27,13 @@ public class Number implements NumberOperations<Number>{
             throw new ArithmeticException("error");
         }
     }
-
+    @Override
+    public boolean isZero(){
+        return value == 0;
+    }
 
     @Override
     public void printNumber() {
-        System.out.println(this.value);
+        System.out.print(this.value + " ");
     }
 }

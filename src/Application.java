@@ -17,25 +17,21 @@ public class Application {
                     int type = 0;
                     while (type < 1 || type > 3)
                     {
-                        System.out.println("Выберете тип хранимых данных в матрице: \n1.Целые\n2.Вещественные\n3.Комплексные");
+                        System.out.println("Выберете тип хранимых данных в матрице: \n1.Вещественные\n2.Комплексные");
                         type = scanner.nextInt();
                     }
                     matrix.setNewMatrix(dimension, type);
                     System.out.println("Матрица была задана");
 
                 }break;
-//                case 2: {
-//                    double det = matrix.getDeterminant();
-//                    if(det == -1242335.23123)
-//                        System.out.println("Невозможно найти определитель прямоугольной матрицы!");
-//                    else
-//                        System.out.print("Определитель матрицы равен: " + det);
-//
-//                }break;
-//                case 3: {
-//                    System.out.println("Ранг матрицы равен: " + matrix.getRank());
-//
-//                }break;
+                case 2: {
+                    System.out.print("Определитель матрицы равен: ");
+                     matrix.getDeterminant();
+                }break;
+                case 3: {
+                    System.out.println("Ранг матрицы равен: " + matrix.getRank());
+
+                }break;
                 case 4:{
                     System.out.println("Матрица была транспонирована");
                     matrix.transpose();
